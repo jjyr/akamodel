@@ -18,6 +18,7 @@ class Schema(object):
 
     @classmethod
     def __force_load_schema(cls):
+        database = cls.get_database()
         get connection
         query..
         build_attributes

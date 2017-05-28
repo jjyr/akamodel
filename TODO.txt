@@ -1,0 +1,7 @@
+[ ] Query table schema from database
+[ ] Generate query methods
+[ ] Support query records
+[ ] Support update, delete, insert
+[ ] Support relations
+[ ] Support transaction
+[ ] Support migrations
