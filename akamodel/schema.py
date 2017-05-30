@@ -20,32 +20,29 @@ class Schema(object):
 
     @classmethod
     def __force_load_schema(cls):
-        database = cls.get_database()
-        cls.__columns = database.executesql(
-            'select * from information_schema.columns where table_name="{}"'.format(cls.table_name()),
-            as_dict=True)
-        cls.__load_schema = True
+        cls._table = cls._table_schema_from_database(cls.table_name(), cls.metadata(), cls.engine())
+        cls.__schema_loaded = True
 
     @classmethod
     def __is_schema_loaded(cls):
         return cls.__schema_loaded
 
     @classmethod
-    def columns(cls):
+    def table(cls):
         cls.__load_schema()
-        return cls.__columns
+        return cls._table
+
+    @classmethod
+    def columns(cls):
+        return cls.table().columns
 
     @classmethod
     def column_names(cls):
-        pass
-
-    @classmethod
-    def is_table_exists(cls):
-        pass
+        return [c.name for c in cls.columns()]
 
     @classmethod
     def table_name(cls):
-        return cls._get_metadata('table_name') or cls.__name__.lower()
+        return cls._get_meta_config('table_name') or cls.__name__.lower()
 
     @classmethod
     def quoted_table_name(cls):

@@ -2,13 +2,18 @@
 handle queries: where, limit, order...
 """
 
+from .relation import Relation
+
 
 class Query(object):
-    def where(self):
-        pass
+    @classmethod
+    def relation(cls):
+        return Relation(cls)
 
-    def all(self):
-        pass
-
-    def first(self):
-        pass
+    # delegate methods to Relation
+    for m in ['where', 'records', 'all', 'exists', 'delete_all', 'update_all']:
+        exec ("""
+@classmethod
+def {method}(cls, *args, **kwargs):
+    return cls.relation().{method}(*args, **kwargs)
+        """.format(method=m))

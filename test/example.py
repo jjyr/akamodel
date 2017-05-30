@@ -4,7 +4,8 @@ from akamodel import Model
 class BaseModel(Model):
     class Meta:
         abstract = True
-        database = 2 # sqlalchemy. database or connection? or connection pool?
+        engine = 2 # sqlalchemy. database or connection? or connection pool?
+        metadata = 2
         table_name = ''
 
 

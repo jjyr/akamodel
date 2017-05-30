@@ -1,7 +1,34 @@
 [ ] Query table schema from database
 [ ] Generate query methods
 [ ] Support query records
-[ ] Support update, delete, insert
+[X] Support update, delete, insert
+[ ] Support multi primary keys
 [ ] Support relations
+[ ] Support 'touch' datetimes
 [ ] Support transaction
 [ ] Support migrations
+
+
+find
+create_with
+distinct
+eager_load
+extending
+from
+group
+having
+includes
+joins
+left_outer_joins
+limit
+lock
+none
+offset
+order
+preload
+readonly
+references
+reorder
+reverse_order
+select
+where
