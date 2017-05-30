@@ -5,7 +5,7 @@ class BaseModel(Model):
     class Meta:
         abstract = True
         database = 2 # sqlalchemy. database or connection? or connection pool?
-        tablename = ''
+        table_name = ''
 
 
 class User(BaseModel):

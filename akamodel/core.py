@@ -13,7 +13,7 @@ class Core(object):
 
     @classmethod
     def _get_metadata(cls, key):
-        return getattr(cls._get_meta(), key)
+        return getattr(cls._get_meta(), key, None)
 
     @classmethod
     def get_database(cls):
