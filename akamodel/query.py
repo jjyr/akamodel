@@ -17,3 +17,11 @@ class Query(object):
 def {method}(cls, *args, **kwargs):
     return cls.relation().{method}(*args, **kwargs)
         """.format(method=m))
+
+    @classmethod
+    def find(cls, id_):
+        return cls.find_by(id=id_)
+
+    @classmethod
+    def find_by(cls, **kwargs):
+        return cls.where(**kwargs).first()

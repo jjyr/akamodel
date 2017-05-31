@@ -9,8 +9,6 @@
 [ ] Support migrations
 
 
-find
-create_with
 distinct
 eager_load
 extending

@@ -40,6 +40,10 @@ class Relation(object):
     def all(self):
         return self.records()
 
+    def first(self):
+        r = self.exec_sql(self.build_sql_exp('select')).first()
+        return self._model(**{c: getattr(r, c, None) for c in self._model.column_names()})
+
     def where(self, *args, **kwargs):
         """
         User.where(name = 'joe', age = '15')

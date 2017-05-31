@@ -16,6 +16,7 @@ print(Person.columns())
 print(Person.column_names())
 
 new = Person.create(name='zero', age=20)
+assert Person.find(new.id) == new
 old_id = new.id
 old_age = new.age
 new.age = 21
