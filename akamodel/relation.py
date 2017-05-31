@@ -89,7 +89,7 @@ class Relation(object):
                 exp = select([self._table.c[c] for c in self.distinct_values])
                 exp = exp.distinct()
             else:
-                exp = self._table.select()
+                exp = select([self._table.c[c] for c in self.select_clause] or self._table.columns)
         elif stmt == 'update':
             exp = self._table.update()
         elif stmt == 'delete':

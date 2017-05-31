@@ -28,6 +28,10 @@ print(new)
 
 print(Person.records())
 
+for r in Person.select('name').records():
+    assert r.name
+    assert not r.age
+
 print(Person.where(name='jjy', age=15).records())
 print(Person.where(name='jjy', age=16).records())
 print('...distinct names')

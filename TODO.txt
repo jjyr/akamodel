@@ -1,6 +1,6 @@
-[ ] Query table schema from database
+[X] Query table schema from database
 [ ] Generate query methods
-[ ] Support query records
+[X] Support query records
 [X] Support update, delete, insert
 [ ] Support multi primary keys
 [ ] Support relations
@@ -25,5 +25,4 @@ readonly
 references
 reorder
 reverse_order
-select
 where
