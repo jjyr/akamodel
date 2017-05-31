@@ -9,10 +9,7 @@
 [ ] Support migrations
 
 
-distinct
 eager_load
-extending
-from
 group
 having
 includes

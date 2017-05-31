@@ -14,7 +14,7 @@ class Person(Model):
 
 print(Person.columns())
 print(Person.column_names())
-
+new = Person.create(name='jjy', age=15)
 new = Person.create(name='zero', age=20)
 assert Person.find(new.id) == new
 old_id = new.id
@@ -30,6 +30,8 @@ print(Person.records())
 
 print(Person.where(name='jjy', age=15).records())
 print(Person.where(name='jjy', age=16).records())
+print('...distinct names')
+print(Person.distinct('name').records())
 
 print('.......delete all')
 

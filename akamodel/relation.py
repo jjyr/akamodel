@@ -18,6 +18,7 @@ class Relation(object):
         self._table = model.table()
         self.where_clause = []
         self.select_clause = []
+        self.distinct_values = []
 
     def exec_sql(self, sql_exp):
         return self._model.engine().execute(sql_exp)
@@ -60,6 +61,11 @@ class Relation(object):
             new.where_clause += conditions
         return new
 
+    def distinct(self, *args):
+        new = copy(self)
+        new.distinct_values = args
+        return new
+
     def select(self, *fields):
         new = copy(self)
         new.select_clause += fields
@@ -75,16 +81,19 @@ class Relation(object):
         return self.exec_sql(self.build_sql_exp('delete')).rowcount
 
     def build_sql_exp(self, stmt):
-        from sqlalchemy import exists
-        exp = self._table
+        from sqlalchemy import exists, select
         if stmt == 'exists':
-            exp = exp.select(exists())
+            exp = self._table.select(exists())
         elif stmt == 'select':
-            exp = exp.select()
+            if self.distinct_values:
+                exp = select([self._table.c[c] for c in self.distinct_values])
+                exp = exp.distinct()
+            else:
+                exp = self._table.select()
         elif stmt == 'update':
-            exp = exp.update()
+            exp = self._table.update()
         elif stmt == 'delete':
-            exp = exp.delete()
+            exp = self._table.delete()
         else:
             raise ValueError('unknown stmt `{}`'.format(stmt))
         for cond in self.where_clause:
