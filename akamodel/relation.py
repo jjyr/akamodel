@@ -23,6 +23,9 @@ class Relation(object):
     def exec_sql(self, sql_exp):
         return self._model.engine().execute(sql_exp)
 
+    def __iter__(self):
+        return self.records().__iter__()
+
     def records(self):
         """
         execute sql
@@ -43,7 +46,7 @@ class Relation(object):
 
     def first(self):
         r = self.exec_sql(self.build_sql_exp('select')).first()
-        return self._model(**{c: getattr(r, c, None) for c in self._model.column_names()})
+        return self._model(**{c: getattr(r, c, None) for c in self._model.column_names()}) if r else None
 
     def where(self, *args, **kwargs):
         """
