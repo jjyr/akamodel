@@ -1,4 +1,4 @@
-from akamodel.model import Model
+from akamodel.base import Base
 from sqlalchemy import create_engine, MetaData
 
 metadata = MetaData()
@@ -6,7 +6,7 @@ metadata = MetaData()
 db = create_engine('mysql+pymysql://root:@127.0.0.1/hehe')
 
 
-class Person(Model):
+class Person(Base):
     class Meta:
         engine = db
         metadata = metadata

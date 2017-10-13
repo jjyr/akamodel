@@ -3,6 +3,7 @@ handle queries: where, limit, order...
 """
 
 from .relation import Relation
+from .errors import RecordNotFound
 
 
 class Query(object):
@@ -12,7 +13,7 @@ class Query(object):
 
     # delegate methods to Relation
     for m in ['select', 'where', 'records', 'all', 'exists', 'delete_all', 'update_all', 'distinct']:
-        exec ("""
+        exec("""
 @classmethod
 def {method}(cls, *args, **kwargs):
     return cls.relation().{method}(*args, **kwargs)
@@ -24,4 +25,7 @@ def {method}(cls, *args, **kwargs):
 
     @classmethod
     def find_by(cls, **kwargs):
-        return cls.where(**kwargs).first()
+        record = cls.where(**kwargs).first()
+        if record is None:
+            raise RecordNotFound('conditions: {}'.format(kwargs))
+        return record

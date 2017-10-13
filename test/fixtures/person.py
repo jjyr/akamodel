@@ -1,4 +1,4 @@
-from akamodel.model import Model
+from akamodel.base import Base
 from .database import metadata, db
 
 from sqlalchemy import Table, Column, Integer, String
@@ -10,7 +10,7 @@ Table('person', metadata,
       ).create(db)
 
 
-class Person(Model):
+class Person(Base):
     class Meta:
         engine = db
         metadata = metadata
