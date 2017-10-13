@@ -21,11 +21,6 @@ having
 includes
 joins
 left_outer_joins
-limit
 lock
-offset
-order
 preload
-readonly
-reorder
 touch methods

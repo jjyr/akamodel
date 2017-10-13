@@ -12,7 +12,7 @@ class Query(object):
         return Relation(cls)
 
     # delegate methods to Relation
-    for m in ['select', 'where', 'records', 'all', 'exists', 'delete_all', 'update_all', 'distinct']:
+    for m in ['select', 'where', 'records', 'all', 'exists', 'delete_all', 'update_all', 'distinct', 'order', 'limit', 'offset']:
         exec("""
 @classmethod
 def {method}(cls, *args, **kwargs):
