@@ -2,11 +2,17 @@
 [ ] Generate query methods
 [X] Support query records
 [X] Support update, delete, insert
-[ ] Support multi primary keys
 [ ] Support relations
-[ ] Support 'touch' datetimes
 [ ] Support transaction
+[ ] Support polymorphic
+[ ] Support calbacks
+[ ] Support changes
+[ ] Support inherited
+[ ] Support validates
+[ ] Support multi primary keys
 [ ] Support migrations
+
+Refactoring(Concern?)
 
 
 eager_load
@@ -17,12 +23,9 @@ joins
 left_outer_joins
 limit
 lock
-none
 offset
 order
 preload
 readonly
-references
 reorder
-reverse_order
-where
+touch methods
