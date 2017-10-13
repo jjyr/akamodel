@@ -32,18 +32,23 @@ def test_where_chain(persons):
     assert Person.where(name='A girl has no name').first() is None
     henrys = Person.where(name='Henry')
     assert len(list(henrys)) == 2
-    assert henrys.where(age=30).all() == Person.where(name='Henry', age=30).all()
+    assert list(henrys.where(age=30)) == list(Person.where(name='Henry', age=30))
 
 
 def test_order(persons):
-    assert Person.order('age', asc=True).all() == sorted(Person.all(), key=lambda p: p.age)
-    assert Person.order('age', desc=True).all() == sorted(Person.all(), key=lambda p: -p.age)
+    assert Person.order('age', asc=True).records() == sorted(Person.all(), key=lambda p: p.age)
+    assert Person.order('age', desc=True).records() == sorted(Person.all(), key=lambda p: -p.age)
 
 
 def test_limit_and_offset(persons):
-    assert len(Person.limit(2).all()) == 2
-    assert len(Person.offset(4).limit(2).all()) == 1
-    records = Person.order('age').offset(1).limit(2).all()
+    assert len(list(Person.limit(2))) == 2
+    assert len(list(Person.offset(4).limit(2))) == 1
+    records = Person.order('age').offset(1).limit(2).records()
     assert len(records) == 2
     assert records[0].name == 'Henry'
     assert records[1].name == 'Henry'
+
+
+def test_count(persons):
+    assert Person.count() == len(Person.records())
+    assert Person.where(name='Henry').count() == 2

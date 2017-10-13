@@ -13,12 +13,12 @@ class Persistence(object):
 
     def _update_record(self, attribute_names=None):
         attribute_names = attribute_names or self.__class__.column_names()
-        return self.__class__.relation().where(id = self.id).update_all(
+        return self.__class__.where(id=self.id).update_all(
             **{a: getattr(self, a, None) for a in attribute_names})
 
     def _create_record(self, attribute_names=None):
         attribute_names = attribute_names or self.__class__.column_names()
-        result = self.__class__.relation().insert(**{a: getattr(self, a, None) for a in attribute_names})
+        result = self.__class__.all()._insert(**{a: getattr(self, a, None) for a in attribute_names})
         id_ = result.inserted_primary_key[0]
         self.id = id_
         return id_
@@ -28,4 +28,4 @@ class Persistence(object):
 
     # FIXME only works on id as primary keys
     def is_new_record(self):
-        return getattr(self, 'id', None) is None or not self.__class__.relation().where(id=self.id).exists()
+        return getattr(self, 'id', None) is None or not self.__class__.where(id=self.id).exists()

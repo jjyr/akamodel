@@ -29,12 +29,15 @@ class Relation(object):
     def __iter__(self):
         return self.records().__iter__()
 
+    def all(self):
+        return self
+
     def records(self):
         """
         execute sql
         :return:
         """
-        rows = self.exec_sql(self.build_sql_exp('select')).fetchall()
+        rows = self.exec_sql(self._build_sql_exp('select')).fetchall()
         results = []
         column_names = self._model.column_names()
         for r in rows:
@@ -42,14 +45,14 @@ class Relation(object):
         return results
 
     def exists(self):
-        return self.exec_sql(self.build_sql_exp('exists')).scalar()
-
-    def all(self):
-        return self.records()
+        return self.exec_sql(self._build_sql_exp('exists')).scalar()
 
     def first(self):
-        r = self.exec_sql(self.build_sql_exp('select')).first()
+        r = self.exec_sql(self._build_sql_exp('select')).first()
         return self._model(**{c: getattr(r, c, None) for c in self._model.column_names()}) if r else None
+
+    def count(self):
+        return self.exec_sql(self._build_sql_exp('count')).scalar()
 
     def where(self, *args, **kwargs):
         """
@@ -95,19 +98,21 @@ class Relation(object):
         new._offset = offset
         return new
 
-    def insert(self, **values):
+    def _insert(self, **values):
         return self.exec_sql(self._table.insert().values(**values).return_defaults())
 
     def update_all(self, **values):
-        return self.exec_sql(self.build_sql_exp('update').values(**values)).rowcount
+        return self.exec_sql(self._build_sql_exp('update').values(**values)).rowcount
 
     def delete_all(self):
-        return self.exec_sql(self.build_sql_exp('delete')).rowcount
+        return self.exec_sql(self._build_sql_exp('delete')).rowcount
 
-    def build_sql_exp(self, stmt):
-        from sqlalchemy import exists, select
+    def _build_sql_exp(self, stmt):
+        from sqlalchemy import exists, select, func
         if stmt == 'exists':
             exp = self._table.select(exists())
+        elif stmt == 'count':
+            exp = select([func.count()]).select_from(self._table)
         elif stmt == 'select':
             if self._distinct_values:
                 exp = select([self._table.c[c] for c in self._distinct_values])
