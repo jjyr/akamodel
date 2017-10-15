@@ -33,6 +33,8 @@ def test_where_chain(persons):
     henrys = Person.where(name='Henry')
     assert len(list(henrys)) == 2
     assert list(henrys.where(age=30)) == list(Person.where(name='Henry', age=30))
+    for p in Person.all():
+        assert Person.where('name=:name and age=:age', name=p.name, age=p.age).first() == p
 
 
 def test_order(persons):
@@ -52,3 +54,11 @@ def test_limit_and_offset(persons):
 def test_count(persons):
     assert Person.count() == len(Person.records())
     assert Person.where(name='Henry').count() == 2
+
+
+def test_group(persons):
+    import itertools
+    assert sorted(Person.group('name').count()) == sorted([(name, len(list(group))) for (name, group) in
+                                                           itertools.groupby(Person.all(), key=lambda p: p.name)])
+    assert Person.group('name').having('count(*) > 1').count() == [('Henry', 2)]
+    assert ('Henry', 2) not in Person.group('name').having('count(*) == :x', x=1).count()

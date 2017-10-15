@@ -22,9 +22,12 @@ class Relation(object):
         self._order_clause = []
         self._offset = None
         self._limit = None
+        self._group_values = []
+        self._having_clause = []
+        self._parameters = dict()
 
     def exec_sql(self, sql_exp):
-        return self._model.engine().execute(sql_exp)
+        return self._model.engine().execute(sql_exp, self._parameters)
 
     def __iter__(self):
         return self.records().__iter__()
@@ -51,8 +54,11 @@ class Relation(object):
         r = self.exec_sql(self._build_sql_exp('select')).first()
         return self._model(**{c: getattr(r, c, None) for c in self._model.column_names()}) if r else None
 
-    def count(self):
-        return self.exec_sql(self._build_sql_exp('count')).scalar()
+    def count(self, field=None):
+        if len(self._group_values) == 0:
+            return self.exec_sql(self._build_sql_exp('count', field)).scalar()
+        else:
+            return self.exec_sql(self._build_sql_exp('count', field)).fetchall()
 
     def where(self, *args, **kwargs):
         """
@@ -63,10 +69,12 @@ class Relation(object):
         :return:
         """
         new = copy(self)
-        if kwargs:
+        if len(args) > 0:
+            new._where_clause.append(('sql_cond', args[0], kwargs))
+        elif kwargs:
             conditions = []
             for k, v in kwargs.items():
-                conditions.append(self._table.c[k] == v)
+                conditions.append(('kw_cond', self._table.c[k] == v))
             new._where_clause += conditions
         return new
 
@@ -88,6 +96,23 @@ class Relation(object):
         new._order_clause.append((field, asc), )
         return new
 
+    def group(self, *fields):
+        new = copy(self)
+        new._group_values = fields
+        return new
+
+    def having(self, *args, **kwargs):
+        """
+        User.where(name = 'joe', age = '15')
+        User.where(name = 'joe').where(age = '15')
+        User.where("name in ?", ['joe', 'harry', 'lee'])
+        :param kwargs:
+        :return:
+        """
+        new = copy(self)
+        new._having_clause.append((args[0], kwargs))
+        return new
+
     def limit(self, limit):
         new = copy(self)
         new._limit = limit
@@ -107,12 +132,20 @@ class Relation(object):
     def delete_all(self):
         return self.exec_sql(self._build_sql_exp('delete')).rowcount
 
-    def _build_sql_exp(self, stmt):
+    def _build_sql_exp(self, stmt, *args):
         from sqlalchemy import exists, select, func
         if stmt == 'exists':
             exp = self._table.select(exists())
         elif stmt == 'count':
-            exp = select([func.count()]).select_from(self._table)
+            query = []
+            c = args[0]
+            if self._group_values is not None:
+                query += [self._table.c[c] for c in self._group_values]
+            if c is not None:
+                query.append(func.count(self._table.c[c]))
+            else:
+                query.append(func.count())
+            exp = select(query).select_from(self._table)
         elif stmt == 'select':
             if self._distinct_values:
                 exp = select([self._table.c[c] for c in self._distinct_values])
@@ -125,8 +158,12 @@ class Relation(object):
             exp = self._table.delete()
         else:
             raise ValueError('unknown stmt `{}`'.format(stmt))
-        for cond in self._where_clause:
-            exp = exp.where(cond)
+        for conds in self._where_clause:
+            if conds[0] == 'sql_cond':
+                exp = exp.where(conds[1])
+                self._parameters.update(conds[2])
+            elif conds[0] == 'kw_cond':
+                exp = exp.where(conds[1])
         for order in self._order_clause:
             c, asc = order
             order_exp = self._table.c[c]
@@ -135,6 +172,12 @@ class Relation(object):
             else:
                 order_exp = order_exp.desc()
             exp = exp.order_by(order_exp)
+        if len(self._group_values) > 0:
+            exp = exp.group_by(*[self._table.c[c] for c in self._group_values])
+        for cond, parameter in self._having_clause:
+            exp = exp.having(cond)
+            if len(parameter) > 0:
+                self._parameters.update(parameter)
         if self._offset:
             exp = exp.offset(self._offset)
         if self._limit:
