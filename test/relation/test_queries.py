@@ -8,9 +8,11 @@ from akamodel.errors import RecordNotFound
 def persons():
     Person.create(name='jjy', age=25)
     Person.create(name='Hari Seldon', age=60)
-    Person.create(name='Alanjandro', age=80)
+    Person.create(name='Anders', age=80)
     Person.create(name='Henry', age=30)
     Person.create(name='Henry', age=27)
+    yield
+    Person.delete_all()
 
 
 def test_find(persons):
@@ -37,6 +39,13 @@ def test_where_chain(persons):
         assert Person.where('name=:name and age=:age', name=p.name, age=p.age).first() == p
 
 
+def test_where_in(persons):
+    assert sorted(list(Person.where('age IN :ages', ages=(30, 80))), key=lambda p: p.name) == sorted(
+        [p for p in Person.all() if p.age in [30, 80]], key=lambda p: p.name)
+    assert sorted(list(Person.where('name NOT IN :names', names=('Hari Seldon', 'jjy'))), key=lambda p: p.name) == sorted(
+        [p for p in Person.all() if p.name not in ('Hari Seldon', 'jjy')], key=lambda p: p.name)
+
+
 def test_order(persons):
     assert Person.order('age', asc=True).records() == sorted(Person.all(), key=lambda p: p.age)
     assert Person.order('age', desc=True).records() == sorted(Person.all(), key=lambda p: -p.age)
@@ -61,4 +70,4 @@ def test_group(persons):
     assert sorted(Person.group('name').count()) == sorted([(name, len(list(group))) for (name, group) in
                                                            itertools.groupby(Person.all(), key=lambda p: p.name)])
     assert Person.group('name').having('count(*) > 1').count() == [('Henry', 2)]
-    assert ('Henry', 2) not in Person.group('name').having('count(*) == :x', x=1).count()
+    assert ('Henry', 2) not in Person.group('name').having('count(*) = :x', x=1).count()

@@ -7,7 +7,7 @@ Table('person', metadata,
       Column('id', Integer, primary_key=True, autoincrement='auto'),
       Column('name', String(16), nullable=False),
       Column('age', Integer)
-      ).create(db)
+      ).create(db, checkfirst=True)
 
 
 class Person(Base):

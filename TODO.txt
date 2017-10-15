@@ -1,5 +1,5 @@
 [X] Query table schema from database
-[ ] Generate query methods
+[X] Generate query methods
 [X] Support query records
 [X] Support update, delete, insert
 [ ] Support relations
@@ -14,13 +14,9 @@
 
 Refactoring(Concern?)
 
-
 eager_load
-group
-having
 includes
 joins
 left_outer_joins
 lock
 preload
-touch methods

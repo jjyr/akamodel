@@ -24,10 +24,18 @@ class Relation(object):
         self._limit = None
         self._group_values = []
         self._having_clause = []
-        self._parameters = dict()
+        self._parameters = None
 
     def exec_sql(self, sql_exp):
-        return self._model.engine().execute(sql_exp, self._parameters)
+        return self._model.engine().execute(sql_exp, self._parameters or ())
+
+    def append_param(self, param):
+        if self._parameters is None:
+            self._parameters = param
+        elif type(self._parameters) is dict:
+            self._parameters.update(param)
+        else:
+            self._parameters += list(param)
 
     def __iter__(self):
         return self.records().__iter__()
@@ -70,7 +78,8 @@ class Relation(object):
         """
         new = copy(self)
         if len(args) > 0:
-            new._where_clause.append(('sql_cond', args[0], kwargs))
+            param = list(args)[1:] if len(args) > 1 else kwargs
+            new._where_clause.append(('sql_cond', args[0], param))
         elif kwargs:
             conditions = []
             for k, v in kwargs.items():
@@ -161,7 +170,7 @@ class Relation(object):
         for conds in self._where_clause:
             if conds[0] == 'sql_cond':
                 exp = exp.where(conds[1])
-                self._parameters.update(conds[2])
+                self.append_param(conds[2])
             elif conds[0] == 'kw_cond':
                 exp = exp.where(conds[1])
         for order in self._order_clause:
@@ -174,10 +183,10 @@ class Relation(object):
             exp = exp.order_by(order_exp)
         if len(self._group_values) > 0:
             exp = exp.group_by(*[self._table.c[c] for c in self._group_values])
-        for cond, parameter in self._having_clause:
+        for cond, param in self._having_clause:
             exp = exp.having(cond)
-            if len(parameter) > 0:
-                self._parameters.update(parameter)
+            if len(param) > 0:
+                self.append_param(param)
         if self._offset:
             exp = exp.offset(self._offset)
         if self._limit:
