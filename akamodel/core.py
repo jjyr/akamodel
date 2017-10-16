@@ -25,12 +25,15 @@ class Core(RawCore):
     __metadata = MetaData()
 
     @classmethod
-    def _meta(cls):
-        return getattr(cls, 'Meta')
+    def _meta(cls, inherited=True):
+        if inherited:
+            return getattr(cls, 'Meta')
+        else:
+            return getattr(cls.__dict__, 'Meta', None)
 
     @classmethod
-    def _get_meta_config(cls, key):
-        return getattr(cls._meta(), key, None)
+    def _get_meta_config(cls, key, inherited=True):
+        return getattr(cls._meta(inherited=inherited), key, None)
 
     @classmethod
     def engine(cls):
@@ -60,4 +63,4 @@ class Core(RawCore):
         is this model abstract
         :return:
         """
-        return cls._get_meta_config('abstract') or False
+        return cls._get_meta_config('abstract', inherited=False) or False

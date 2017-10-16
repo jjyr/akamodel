@@ -21,6 +21,7 @@ Table('pet', metadata,
 class BaseRecord(Base):
     class Meta:
         engine = db
+        abstract = True
 
 
 class Person(BaseRecord):
