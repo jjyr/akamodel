@@ -2,7 +2,6 @@
 handle queries: where, limit, order...
 """
 from .collection_proxy import CollectionProxy
-from .errors import RecordNotFound
 
 
 class _Meta(type):
@@ -18,13 +17,3 @@ class Query(object, metaclass=_Meta):
     def all(cls):
         return CollectionProxy(model=cls)
 
-    @classmethod
-    def find(cls, id_):
-        return cls.find_by(id=id_)
-
-    @classmethod
-    def find_by(cls, **kwargs):
-        record = cls.where(**kwargs).first()
-        if record is None:
-            raise RecordNotFound('conditions: {}'.format(kwargs))
-        return record

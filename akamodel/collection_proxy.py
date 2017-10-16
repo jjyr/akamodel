@@ -1,10 +1,20 @@
 from .relation import Relation
+from .errors import RecordNotFound
 
 
 class CollectionProxy(object):
     def __init__(self, model, relation=None):
         self._model = model
         self._relation = relation or Relation(model=model)
+
+    def find(self, id_):
+        return self.find_by(id=id_)
+
+    def find_by(self, **kwargs):
+        record = self.where(**kwargs).first()
+        if record is None:
+            raise RecordNotFound('conditions: {}'.format(kwargs))
+        return record
 
     def create(self, **values):
         attributes = self.__attributes_from_relation()
