@@ -7,7 +7,7 @@ An ActiveRecord-like ORM in python world
 
 > Note: **Akamodel** only support python3
 
-> You maybe noticed Akamodel is not yet product-ready, I would be glad if you use it in some personal projects. Feel free to open issues or  contact me if you have any confuse
+> You maybe noticed Akamodel is not yet product-ready, I would be glad if you use it in personal projects. Feel free to open issues or contact me if you have any confuse
 
 `pip install git+https://github.com/jjyr/akamodel.git@master`
 
@@ -27,7 +27,7 @@ Run `pip install pymysql3` to install mysql driver
 You can also use PostgreSQL, Oracle, Microsoft SQL server.. [View SQLAlchemy document](http://docs.sqlalchemy.org/en/latest/dialects/index.html) to find out how to install DB drivers
 
 ## Table define
-> This step is not necessary for using akamodel, akamodel can auto load DB schema from database. So do not need to define table schemas in python, if you want to access exists tables. This section just demostrate currently solution for define and creation tables: using SQLAlchemy
+> This step is not necessary for using akamodel, akamodel can auto load DB schema from database. So it's not necessary to define table schema in python if you want to access exists tables. This section just demostrate currently solution for definition and creation of tables: using SQLAlchemy
 
  In the future, Akamodel will provide table define DSL to instead of directly use SQLAlchemy
 
@@ -56,7 +56,7 @@ Table('pet', metadata,
 
 ## Using Akamodel
 
-View [test cases](/test) for newest support usage
+View [test cases](/test) to find out newest features
 
 ``` python
 from akamodel import Base
@@ -88,8 +88,8 @@ Person.count() # 2
 
 # Basic queries
 Person.find(1) == Person.find_by(id=1) == Person.where(id=1).first() # true
-Person.find(0) or Person.find_by(id: 0) # raise akamodel.errors.RecordNotFound
-Person.where(id=0).first() # None
+Person.find(0) or Person.find_by(id: 0) # find find_by raise akamodel.errors.RecordNotFound if not found
+Person.where(id=0).first() # first return None if not found
 Person.where(name='jjy', age=25).first() == jjy # True
 
 
@@ -117,31 +117,31 @@ Person.group('name').having('count(*) > 1').count() # []
 
 
 # Build or create record by query condition
-person = Person.where(name='jack', age=30).build()
+person = Person.where(name='jack', age=30).build() # build record from query condition, do not save to database
 person.is_new_record() # True
 
-person = Person.where(name='jack', age=30).first_or_build() # return record if existed one, otherwise build a new record(not saved to database)
+person = Person.where(name='jack', age=30).first_or_build() # find or build record from query condition
 person.is_new_record() # True
 
-person = Person.where(name='jack', age=30).first_or_create() # return record if existed one, otherwise create a new record
+person = Person.where(name='jack', age=30).first_or_create() # find or create new record from query condition, Equivalent with Person.create(name='jack', age=30)
 person.is_new_record() # False
 
 
 # Model relation
 cola = jjy.pets.create(name='cola', age=1) # create related pet record
 cola.attributes # {'name': 'cola', age: 1, person_id: 1}
-jjy.pets.first() == cola # True
-jjy.pets.find_by(name='cola') == cola # Equivalent with Pet.where(person_id=jjy.id).find_by(name='cola')
+jjy.pets.first() == cola # query from pet
+jjy.pets.find_by(name='cola') == cola # equivalent with Pet.where(person_id=jjy.id).find_by(name='cola')
 
 ```
 
 # Future Plan
 
-- [ ] Advantage relations (`has_many`, `belongs_to`, `has_and_belongs_to`, polymorphic relation)
+- [ ] Advanced relations (`has_many`, `belongs_to`, `has_and_belongs_to`, polymorphic relation)
 - [ ] DB transaction
 - [ ] Thread safe
 - [ ] Single table inherited
-- [ ] Advantage DB functions(lock, joins...)
-- [ ] Advantage model features (callbacks, changes, validation)
+- [ ] Advanced DB functions(lock, joins...)
+- [ ] Advanced model features (callbacks, changes, validation)
 - [ ] * Table define DSL
 - [ ] * DB migration tools
