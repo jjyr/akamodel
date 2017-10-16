@@ -78,14 +78,23 @@ class Relation(object):
         """
         new = copy(self)
         if len(args) > 0:
-            param = list(args)[1:] if len(args) > 1 else kwargs
-            new._where_clause.append(('sql_cond', args[0], param))
+            sql, *params = args
+            new._where_clause.append((sql, params or kwargs))
         elif kwargs:
-            conditions = []
-            for k, v in kwargs.items():
-                conditions.append(('kw_cond', self._table.c[k] == v))
-            new._where_clause += conditions
+            new._where_clause.append(kwargs)
         return new
+
+    def conditions(self):
+        """
+        return conditions
+        :return: dict
+        """
+        conditions = {}
+        for cond in self._where_clause:
+            if isinstance(cond, dict):
+                conditions.update(cond)
+
+        return conditions
 
     def distinct(self, *args):
         new = copy(self)
@@ -167,12 +176,14 @@ class Relation(object):
             exp = self._table.delete()
         else:
             raise ValueError('unknown stmt `{}`'.format(stmt))
-        for conds in self._where_clause:
-            if conds[0] == 'sql_cond':
-                exp = exp.where(conds[1])
-                self.append_param(conds[2])
-            elif conds[0] == 'kw_cond':
-                exp = exp.where(conds[1])
+        for cond in self._where_clause:
+            if isinstance(cond, tuple):
+                sql, *params = cond
+                exp = exp.where(sql)
+                self.append_param(params)
+            elif isinstance(cond, dict):
+                for k, v in cond.items():
+                    exp = exp.where(self._table.c[k] == v)
         for order in self._order_clause:
             c, asc = order
             order_exp = self._table.c[c]
