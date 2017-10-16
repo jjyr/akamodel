@@ -35,6 +35,7 @@ def test_where_chain(persons):
     henrys = Person.where(name='Henry')
     assert len(list(henrys)) == 2
     assert list(henrys.where(age=30)) == list(Person.where(name='Henry', age=30))
+    assert list(henrys.where(age=27)) == list(Person.where(name='Henry', age=27))
     with pytest.raises(RecordNotFound):
         henrys.find_by(age=42)
     for p in Person.all():

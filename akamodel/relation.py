@@ -9,7 +9,7 @@ r.first() => <# object>
 
 Relation object build a real sql and execute it...
 """
-from copy import copy
+from copy import deepcopy as copy
 
 
 class Relation(object):
