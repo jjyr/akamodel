@@ -10,7 +10,8 @@ from setuptools import find_packages, setup
 
 LOG = logging.getLogger(__name__)
 
-description = ""
+description = "An ActiveRecord-like ORM in python world"
+
 
 class TestCommand(Command):
     user_options = []
@@ -30,22 +31,25 @@ class TestCommand(Command):
 
 setup(name='akamodel',
       version='0.0.0',
+      license='Apache-2.0',
       description=description,
+      long_description=open('README.md', encoding='utf-8').read(),
       author='Jiang Jinyang',
       author_email='hari.jiang@outlook.com',
       cmdclass={'test': TestCommand},
       platforms=['unix', 'linux', 'osx'],
       packages=find_packages(),
       install_requires=[
+          'sqlalchemy'
       ],
       entry_points={
           'console_scripts': [
           ],
       },
       classifiers=[
-          'License :: OSI Approved :: MIT License',
-          'Operating System :: POSIX',
-          'Operating System :: MacOS :: MacOS X',
+          'Intended Audience :: Developers',
+          'License :: OSI Approved :: Apache Software License',
+          'Operating System :: OS Independent',
           'Programming Language :: Python :: 3',
           'Programming Language :: Python :: 3.3',
           'Programming Language :: Python :: 3.4',
