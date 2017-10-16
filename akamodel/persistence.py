@@ -18,7 +18,12 @@ class Persistence(object):
 
     def _create_record(self, attribute_names=None):
         attribute_names = attribute_names or self.__class__.column_names()
-        result = self.__class__.all()._insert(**{a: getattr(self, a, None) for a in attribute_names})
+        attribtutes = {a: getattr(self, a, None) for a in attribute_names}
+        # should handle defaults columns?
+        primary_key = self.__class__.primary_key()
+        if primary_key in attribtutes and attribtutes[primary_key] is None:
+            del attribtutes[primary_key]
+        result = self.__class__.all()._insert(**attribtutes)
         id_ = result.inserted_primary_key[0]
         self.id = id_
         return id_

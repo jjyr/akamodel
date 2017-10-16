@@ -5,6 +5,7 @@
 [ ] Support relations
 [ ] Support transaction
 [ ] Support polymorphic
+[ ] Thread Safe
 [ ] Support calbacks
 [ ] Support changes
 [ ] Support inherited

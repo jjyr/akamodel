@@ -4,19 +4,26 @@ make a class become akamodel
 support reflection from database
 query via where, limit.. methods
 """
+from akamodel.metadata import MetaData
 
 
 class RawCore(object):
     """
     sqlalchemy operations
     """
+
     @classmethod
-    def _table_schema_from_database(cls, table_name, metadata, engine):
+    def _table_schema_from_database(cls):
         from sqlalchemy import Table
-        return Table(table_name, metadata, autoload=True, autoload_with=engine)
+        table_name = cls.table_name()
+        raw_metadata = cls.metadata()._raw_metadata
+        engine = cls.engine()
+        return Table(table_name, raw_metadata, autoload=True, autoload_with=engine)
 
 
 class Core(RawCore):
+    __metadata = MetaData()
+
     @classmethod
     def _meta(cls):
         return getattr(cls, 'Meta')
@@ -39,10 +46,18 @@ class Core(RawCore):
     @classmethod
     def metadata(cls):
         """
-        get metadata, it supposed as a sqlalchemy metadata object
+        get metadata
         :return:
         """
-        metadata = cls._get_meta_config('metadata')
+        metadata = cls._get_meta_config('metadata') or cls.__metadata
         if not metadata:
             raise ValueError("Must set Meta.metadata in model")
         return metadata
+
+    @classmethod
+    def abstract(cls):
+        """
+        is this model abstract
+        :return:
+        """
+        return cls._get_meta_config('abstract') or False

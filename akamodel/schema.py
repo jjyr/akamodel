@@ -2,7 +2,8 @@
 load model schema from db
 """
 
-from akamodel.utils.quoting import *
+from akamodel.utils import quoting
+from akamodel.utils import naming
 
 
 class Schema(object):
@@ -20,7 +21,7 @@ class Schema(object):
 
     @classmethod
     def __force_load_schema(cls):
-        cls._table = cls._table_schema_from_database(cls.table_name(), cls.metadata(), cls.engine())
+        cls._table = cls._table_schema_from_database()
         cls.__schema_loaded = True
 
     @classmethod
@@ -42,8 +43,8 @@ class Schema(object):
 
     @classmethod
     def table_name(cls):
-        return cls._get_meta_config('table_name') or cls.__name__.lower()
+        return cls._get_meta_config('table_name') or naming.to_underscore(cls.__name__)
 
     @classmethod
     def quoted_table_name(cls):
-        return quote_table_name(cls.table_name())
+        return quoting.quote_table_name(cls.table_name())

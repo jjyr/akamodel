@@ -1,6 +1,6 @@
 # content of conftest.py
 import pytest
-from ..fixtures.person import Person
+from test.fixtures.models import Person
 from akamodel.errors import RecordNotFound
 
 
@@ -42,7 +42,8 @@ def test_where_chain(persons):
 def test_where_in(persons):
     assert sorted(list(Person.where('age IN :ages', ages=(30, 80))), key=lambda p: p.name) == sorted(
         [p for p in Person.all() if p.age in [30, 80]], key=lambda p: p.name)
-    assert sorted(list(Person.where('name NOT IN :names', names=('Hari Seldon', 'jjy'))), key=lambda p: p.name) == sorted(
+    assert sorted(list(Person.where('name NOT IN :names', names=('Hari Seldon', 'jjy'))),
+                  key=lambda p: p.name) == sorted(
         [p for p in Person.all() if p.name not in ('Hari Seldon', 'jjy')], key=lambda p: p.name)
 
 
