@@ -1,7 +1,10 @@
+from .relation import Relation
+
+
 class CollectionProxy(object):
     def __init__(self, model, relation=None):
         self._model = model
-        self._relation = relation or model.all()
+        self._relation = relation or Relation(model=model)
 
     def create(self, **values):
         attributes = self.__attributes_from_relation()
@@ -12,6 +15,15 @@ class CollectionProxy(object):
         attributes = self.__attributes_from_relation()
         attributes.update(values)
         return self._model(**attributes)
+
+    def first_or_build(self, **values):
+        return self.first() or self.build(**values)
+
+    def first_or_create(self, **values):
+        return self.first() or self.create(**values)
+
+    def where(self, *args, **kwargs):
+        return CollectionProxy(model=self._model, relation=self._relation.where(*args, **kwargs))
 
     def __attributes_from_relation(self):
         return self._relation.conditions()

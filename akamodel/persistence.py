@@ -31,6 +31,7 @@ class Persistence(object):
     def save(self):
         self.create_or_update()
 
-    # FIXME only works on id as primary keys
     def is_new_record(self):
-        return getattr(self, 'id', None) is None or not self.__class__.where(id=self.id).exists()
+        primary_key = self.__class__.primary_key()
+        return getattr(self, primary_key, None) is None or not self.__class__.where(
+            id=self.attributes[primary_key]).exists()

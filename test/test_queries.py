@@ -20,7 +20,7 @@ def test_find(persons):
     assert p == Person.find(p.id)
     assert p.age == 25
     with pytest.raises(RecordNotFound):
-        Person.find(42)
+        Person.find(0)
 
 
 def test_find_by(persons):
